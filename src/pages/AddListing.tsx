@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,8 +6,45 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
 
 const AddListing = () => {
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const { toast } = useToast();
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newImages: string[] = [];
+    Array.from(files).forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            newImages.push(event.target.result as string);
+            if (newImages.length === files.length) {
+              setUploadedImages((prev) => [...prev, ...newImages]);
+              toast({
+                title: 'Фото загружены',
+                description: `Добавлено ${files.length} фотографий`,
+              });
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+    toast({
+      title: 'Фото удалено',
+      variant: 'destructive',
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -68,15 +106,52 @@ const AddListing = () => {
               <Icon name="ImagePlus" size={24} />
               Фотографии
             </h2>
-            <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+
+            {uploadedImages.length > 0 && (
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                {uploadedImages.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img 
+                      src={image} 
+                      alt={`Фото ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                    >
+                      <Icon name="X" size={16} />
+                    </button>
+                    {index === 0 && (
+                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-primary text-white text-xs rounded">
+                        Главное фото
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <label className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer block">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
               <Icon name="Upload" size={48} className="mx-auto text-muted-foreground mb-4" />
               <p className="text-sm text-muted-foreground mb-2">
                 Нажмите или перетащите фотографии сюда
               </p>
               <p className="text-xs text-muted-foreground">
-                Рекомендуется загрузить минимум 3 фотографии
+                {uploadedImages.length === 0 
+                  ? 'Рекомендуется загрузить минимум 3 фотографии'
+                  : `Загружено ${uploadedImages.length} фото. Можно добавить ещё`
+                }
               </p>
-            </div>
+            </label>
           </Card>
 
           <Card className="p-6">
