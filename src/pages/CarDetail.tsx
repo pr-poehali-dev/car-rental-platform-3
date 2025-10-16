@@ -59,6 +59,53 @@ const CarDetail = () => {
     ],
   };
 
+  const reviews = [
+    {
+      id: '1',
+      author: 'Александр М.',
+      avatar: '',
+      rating: 5,
+      date: '15 янв 2024',
+      text: 'Отличный автомобиль! Чистый, ухоженный, все работает как надо. Владелец приветливый и пунктуальный. Обязательно возьму еще раз.',
+      helpful: 12,
+    },
+    {
+      id: '2',
+      author: 'Мария К.',
+      avatar: '',
+      rating: 5,
+      date: '8 янв 2024',
+      text: 'Прекрасный опыт аренды! Машина в идеальном состоянии, салон чистый, запах новый. Иван подробно всё объяснил и показал. Рекомендую!',
+      helpful: 8,
+    },
+    {
+      id: '3',
+      author: 'Дмитрий С.',
+      avatar: '',
+      rating: 4,
+      date: '2 янв 2024',
+      text: 'Хорошая машина для своих денег. Комфортная, динамичная. Небольшая царапина на двери, но владелец предупредил заранее.',
+      helpful: 5,
+    },
+    {
+      id: '4',
+      author: 'Елена В.',
+      avatar: '',
+      rating: 5,
+      date: '28 дек 2023',
+      text: 'Брала на свадьбу - все гости в восторге! Машина выглядит дорого, едет отлично. Иван помог с украшениями. Спасибо!',
+      helpful: 15,
+    },
+  ];
+
+  const ratingDistribution = [
+    { stars: 5, count: 18, percentage: 78 },
+    { stars: 4, count: 4, percentage: 17 },
+    { stars: 3, count: 1, percentage: 4 },
+    { stars: 2, count: 0, percentage: 0 },
+    { stars: 1, count: 0, percentage: 0 },
+  ];
+
   const calculateDays = () => {
     if (dateRange.from && dateRange.to) {
       const diff = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
@@ -207,6 +254,83 @@ const CarDetail = () => {
                   Написать
                 </Button>
               </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold">Отзывы</h2>
+                <div className="flex items-center gap-2">
+                  <Icon name="Star" size={20} className="fill-yellow-400 text-yellow-400" />
+                  <span className="text-2xl font-bold">{car.rating}</span>
+                  <span className="text-muted-foreground">({car.reviews} отзывов)</span>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                {ratingDistribution.map((item) => (
+                  <div key={item.stars} className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 w-16">
+                      <span className="text-sm font-medium">{item.stars}</span>
+                      <Icon name="Star" size={14} className="fill-yellow-400 text-yellow-400" />
+                    </div>
+                    <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-yellow-400 transition-all"
+                        style={{ width: `${item.percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm text-muted-foreground w-12 text-right">{item.count}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Button variant="outline" className="w-full mb-6">
+                <Icon name="MessageSquarePlus" size={18} className="mr-2" />
+                Оставить отзыв
+              </Button>
+
+              <div className="space-y-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="border-b pb-6 last:border-b-0 last:pb-0">
+                    <div className="flex items-start gap-4 mb-3">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={review.avatar} />
+                        <AvatarFallback className="bg-secondary">
+                          {review.author.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="font-semibold">{review.author}</h4>
+                          <span className="text-sm text-muted-foreground">{review.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1 mb-2">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Icon
+                              key={i}
+                              name="Star"
+                              size={14}
+                              className={i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                          {review.text}
+                        </p>
+                        <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+                          <Icon name="ThumbsUp" size={14} />
+                          <span>Полезно ({review.helpful})</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button variant="ghost" className="w-full mt-4">
+                Показать все отзывы ({car.reviews})
+                <Icon name="ChevronDown" size={18} className="ml-2" />
+              </Button>
             </Card>
           </div>
 
