@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +15,7 @@ interface CarCardProps {
   features?: string[];
 }
 
-const CarCard = ({ image, name, category, price, location, features = [] }: CarCardProps) => {
+const CarCard = ({ id, image, name, category, price, location, features = [] }: CarCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   return (
@@ -63,9 +64,11 @@ const CarCard = ({ image, name, category, price, location, features = [] }: CarC
             <span className="text-2xl font-bold text-primary">${price}</span>
             <span className="text-sm text-muted-foreground">/день</span>
           </div>
-          <Button size="sm">
-            Подробнее
-          </Button>
+          <Link to={`/car/${id}`}>
+            <Button size="sm">
+              Подробнее
+            </Button>
+          </Link>
         </div>
       </div>
     </Card>

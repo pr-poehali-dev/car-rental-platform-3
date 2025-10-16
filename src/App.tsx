@@ -9,6 +9,7 @@ import Catalog from "./pages/Catalog";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import AddListing from "./pages/AddListing";
+import CarDetail from "./pages/CarDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/car/:id" element={<CarDetail />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-listing" element={<AddListing />} />
