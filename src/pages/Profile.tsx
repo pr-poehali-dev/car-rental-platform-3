@@ -1,12 +1,25 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import { storage, initializeDefaultCars } from '@/lib/storage';
 
 const Profile = () => {
-  const userListings = [
+  const [userListings, setUserListings] = useState<any[]>([]);
+
+  useEffect(() => {
+    initializeDefaultCars();
+    const listingIds = storage.getUserListings();
+    const allCars = storage.getCars();
+    const listings = allCars.filter(car => listingIds.includes(car.id));
+    setUserListings(listings);
+  }, []);
+
+  const defaultListings = [
     {
       id: '1',
       name: 'BMW X5',
@@ -76,41 +89,58 @@ const Profile = () => {
 
           <TabsContent value="listings">
             <div className="space-y-4">
-              {userListings.map((listing) => (
-                <Card key={listing.id} className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-24 h-16 bg-gray-200 rounded"></div>
-                      <div>
-                        <h3 className="font-bold text-lg">{listing.name}</h3>
-                        <div className="flex gap-4 mt-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Icon name="Eye" size={16} />
-                            {listing.views} просмотров
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Icon name="Calendar" size={16} />
-                            {listing.bookings} аренд
-                          </span>
+              {userListings.length === 0 ? (
+                <Card className="p-12 text-center">
+                  <Icon name="Car" size={64} className="mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Нет объявлений</h3>
+                  <p className="text-muted-foreground mb-6">Разместите свой первый автомобиль</p>
+                  <Link to="/add-listing">
+                    <Button>
+                      <Icon name="Plus" size={18} className="mr-2" />
+                      Создать объявление
+                    </Button>
+                  </Link>
+                </Card>
+              ) : (
+                <>
+                  {userListings.map((listing) => (
+                    <Card key={listing.id} className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <img src={listing.image} alt={listing.name} className="w-24 h-16 object-cover rounded" />
+                          <div>
+                            <h3 className="font-bold text-lg">{listing.name}</h3>
+                            <div className="flex gap-4 mt-1 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Icon name="DollarSign" size={16} />
+                                ${listing.price}/день
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Icon name="MapPin" size={16} />
+                                {listing.location}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Link to={`/car/${listing.id}`}>
+                            <Button variant="outline" size="sm">
+                              <Icon name="Eye" size={16} className="mr-2" />
+                              Просмотр
+                            </Button>
+                          </Link>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Icon name="Edit" size={16} className="mr-2" />
-                        Редактировать
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Icon name="MoreVertical" size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-              <Button className="w-full" variant="outline">
-                <Icon name="Plus" size={18} className="mr-2" />
-                Добавить новое объявление
-              </Button>
+                    </Card>
+                  ))}
+                  <Link to="/add-listing">
+                    <Button className="w-full" variant="outline">
+                      <Icon name="Plus" size={18} className="mr-2" />
+                      Добавить новое объявление
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </TabsContent>
 

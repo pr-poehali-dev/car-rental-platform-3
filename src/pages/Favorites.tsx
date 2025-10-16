@@ -1,9 +1,21 @@
+import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import CarCard from '@/components/CarCard';
 import Icon from '@/components/ui/icon';
+import { storage, initializeDefaultCars } from '@/lib/storage';
 
 const Favorites = () => {
-  const favorites = [
+  const [favorites, setFavorites] = useState<any[]>([]);
+
+  useEffect(() => {
+    initializeDefaultCars();
+    const favoriteIds = storage.getFavorites();
+    const allCars = storage.getCars();
+    const favoriteCars = allCars.filter(car => favoriteIds.includes(car.id));
+    setFavorites(favoriteCars);
+  }, []);
+
+  const defaultFavorites = [
     {
       id: '1',
       name: 'Mercedes-Benz C-Class',

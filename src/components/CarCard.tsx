@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { storage } from '@/lib/storage';
+import { useToast } from '@/hooks/use-toast';
 
 interface CarCardProps {
   id: string;
@@ -17,6 +19,30 @@ interface CarCardProps {
 
 const CarCard = ({ id, image, name, category, price, location, features = [] }: CarCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setIsFavorite(storage.isFavorite(id));
+  }, [id]);
+
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isFavorite) {
+      storage.removeFromFavorites(id);
+      toast({
+        title: 'Удалено из избранного',
+        variant: 'destructive',
+      });
+    } else {
+      storage.addToFavorites(id);
+      toast({
+        title: 'Добавлено в избранное',
+      });
+    }
+    setIsFavorite(!isFavorite);
+  };
 
   return (
     <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 animate-fade-in">
@@ -27,7 +53,7 @@ const CarCard = ({ id, image, name, category, price, location, features = [] }: 
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <button
-          onClick={() => setIsFavorite(!isFavorite)}
+          onClick={toggleFavorite}
           className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform"
         >
           <Icon 

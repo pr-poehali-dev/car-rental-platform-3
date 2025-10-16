@@ -1,11 +1,21 @@
+import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import FilterSection from '@/components/FilterSection';
 import CarCard from '@/components/CarCard';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { storage, initializeDefaultCars } from '@/lib/storage';
 
 const Index = () => {
-  const featuredCars = [
+  const [featuredCars, setFeaturedCars] = useState<any[]>([]);
+
+  useEffect(() => {
+    initializeDefaultCars();
+    const cars = storage.getCars();
+    setFeaturedCars(cars.slice(0, 6));
+  }, []);
+
+  const defaultCars = [
     {
       id: '1',
       name: 'Mercedes-Benz C-Class',

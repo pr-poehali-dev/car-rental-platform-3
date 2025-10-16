@@ -1,9 +1,18 @@
+import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import FilterSection from '@/components/FilterSection';
 import CarCard from '@/components/CarCard';
+import { storage, initializeDefaultCars } from '@/lib/storage';
 
 const Catalog = () => {
-  const cars = [
+  const [cars, setCars] = useState<any[]>([]);
+
+  useEffect(() => {
+    initializeDefaultCars();
+    setCars(storage.getCars());
+  }, []);
+
+  const defaultCars = [
     {
       id: '1',
       name: 'Mercedes-Benz C-Class',
